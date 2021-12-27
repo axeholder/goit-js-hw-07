@@ -1,18 +1,17 @@
 import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
-// console.log(galleryItems);
+const instance = basicLightbox.create(`
+    <div class="modal">
+         <img src="">
+    </div>`
+);
 
 const imageContainer = document.querySelector('.gallery');
-const galleryMarkup = createGalleryMarkup(galleryItems);
-imageContainer.insertAdjacentHTML('beforeend', galleryMarkup);
+const modal = instance.element().querySelector('img');
 
-// console.log(createGalleryMarkup(galleryItems));
-
-
-function createGalleryMarkup(galleryItems) {
-    return galleryItems.map(({ preview, original, description }) => {
-        return `
+const galleryMarkup = galleryItems.map(({ preview, original, description }) => 
+     `
     <div class="gallery__item">
   <a class="gallery__link" href="${original}">
     <img
@@ -23,7 +22,28 @@ function createGalleryMarkup(galleryItems) {
     />
   </a>
 </div>
-`;
-    }).join('');
+`).join('');
+
+imageContainer.insertAdjacentHTML('beforeend', galleryMarkup);
+
+function onOpenModal(evt) {
+    evt.preventDefault()
+    if (evt.currentTarget === evt.target) {
+        return;
+    };
+
+    modal.src = evt.target.dataset.source;
+    document.addEventListener('keydown', onEscKeyPress);
+
+    instance.show();
 };
 
+function onEscKeyPress(evt) {
+    if (evt.code === 'Escape') {
+    document.removeEventListener('keydown', onEscKeyPress);
+    instance.close()
+    };
+};
+
+window.addEventListener('click', onEscKeyPress);
+imageContainer.addEventListener('click', onOpenModal);
